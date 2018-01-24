@@ -1,55 +1,43 @@
 pragma solidity ^0.4.16;
-import "./Election.sol";
+import "owned.sol";
 
 /// @title Election interface for Voting
-contract YesNoElection is Election{
-  function isValidBallot(Ballot b) public returns (bool){
-    return bool(YesNoBallot(b).isYesNoBallot);
+contract YesNoElection {
+  YesNoBallot[] public ballots;
+  mapping(address => uint) public weights;
+  event BallotCreated(address ballot, address owner, uint index);
+  function getBallot() public {
+    YesNoBallot b = new YesNoBallot();
+    b.transferOwnership(msg.sender);
+    ballots.push(b);
+    weights[b]=1;
+    BallotCreated(b,msg.sender,ballots.length);
   }
-  function getWinner(BallotList l) public returns (Winner){
-    return new YesNoWinner(l.getWeight(0)<l.getWeight(1));
+  function getWinner() public view returns (bool){
+    uint yes = 0;
+    uint no = 0;
+    for(uint i=0;i<ballots.length;i++){
+      if(ballots[i].voted()){
+        if(ballots[i].vote()){
+          yes += weights[ballots[i]];
+        }else{
+          no += weights[ballots[i]];
+        }
+      }
+    }
+    return yes > no;
   }
 }
 
-contract YesNoBallot is Ballot{
-  bool public isYesNoBallot;
+contract YesNoBallot is owned {
+  bool public voted;
   bool public vote;
-  function YesNoBallot(bool v) public{
-    isYesNoBallot = true;
-    vote=v;
+  function YesNoBallot() public {
+    voted = false;
+    vote = false;
   }
-}
-contract YesNoBallotList is BallotList{
-  uint trueWeight;
-  uint falseWeight;
-  function ittLength() public returns (uint){
-    return 2;
-  }
-  function getBallot(uint i) public returns (Ballot){
-    if(i==0){
-      return new YesNoBallot(false);
-    }else{
-      return new YesNoBallot(true);
-    }
-  }
-  function getWeight(uint i) public returns (uint){
-    if(i==0){
-      return falseWeight;
-    }else{
-      return trueWeight;
-    }
-  }
-  function addBallot(Ballot b, uint w) public{
-    if(b.vote){
-      trueWeight += w;
-    }else{
-      falseWeight += w;
-    }
-  }
-}
-contract YesNoWinner is Winner{
-  bool vote;
-  function YesNoWinner(bool v) public{
-    vote=v;
+  function changeVote(bool v) public onlyOwner {
+    voted = true;
+    vote = v;
   }
 }
