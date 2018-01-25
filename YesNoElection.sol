@@ -1,39 +1,36 @@
 pragma solidity ^0.4.16;
 import "owned.sol";
+import "Election.sol";
 
-/// @title Election interface for Voting
-contract YesNoElection {
-  YesNoBallot[] public ballots;
-  mapping(address => uint) public weights;
-  event BallotCreated(address ballot, address owner, uint index);
+/// @title choose yes or no in an election
+contract YesNoElection is Election {
+
   function getBallot() public {
-    YesNoBallot b = new YesNoBallot();
-    b.transferOwnership(msg.sender);
-    ballots.push(b);
-    weights[b]=1;
-    BallotCreated(b,msg.sender,ballots.length);
+    Ballot b = new YesNoBallot();
+    Election.addBallot(b);
   }
-  function getWinner() public view returns (bool){
+  function getWinner() public view returns (bytes32){
     uint yes = 0;
     uint no = 0;
     for(uint i=0;i<ballots.length;i++){
       if(ballots[i].voted()){
-        if(ballots[i].vote()){
+        if(YesNoBallot(ballots[i]).vote()){
           yes += weights[ballots[i]];
         }else{
           no += weights[ballots[i]];
         }
       }
     }
-    return yes > no;
+    if(yes > no){
+      return 'yes';
+    }
+    return 'no';
   }
 }
 
-contract YesNoBallot is owned {
-  bool public voted;
+contract YesNoBallot is owned,Ballot {
   bool public vote;
   function YesNoBallot() public {
-    voted = false;
     vote = false;
   }
   function changeVote(bool v) public onlyOwner {

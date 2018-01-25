@@ -4,6 +4,7 @@ fs = require('fs');
 accounts = web3.eth.accounts;
 code = {
   'owned.sol': fs.readFileSync('owned.sol').toString(),
+  'Election.sol': fs.readFileSync('Election.sol').toString(),
   'YesNoElection.sol': fs.readFileSync('YesNoElection.sol').toString()
 };
 solc = require('solc');
