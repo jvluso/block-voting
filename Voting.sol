@@ -1,66 +1,55 @@
 pragma solidity ^0.4.16;
 import "./Election.sol";
+import "./YesNoElection.sol";
+import "./PluralityElection.sol";
+import "./owned.sol";
 
 /// @title Voting with erc20 compliant liquid tokens.
-contract Voting {
+contract Voting is owned{
 
-    event testEvent();
+    event ElectionCreated(address election);
 
-
-    // This declares a new complex type which will
-    // be used for variables later.
-    // It will represent a single voter.
-    struct Voter {
-        uint weight; // weight is accumulated
-        Ballot vote;   // index of the voted proposal
-    }
-
-
-    address public chairperson;
-
-    // This declares a state variable that
-    // stores a `Voter` struct for each possible address.
-    mapping(address => Voter) public voters;
+    mapping(address => uint) public voters;
     address[] public votersList;
-
-    Election election;
-
-    /// Create a new ballot to choose one of `proposalNames`.
-    function Voting() public {
-        chairperson = msg.sender;
-        voters[chairperson].weight = 1;
-        election = new YesNoElection();
-
+    struct electionData{
+      Election election;
+      mapping(address => uint) unclaimedWeight;
     }
+    mapping(address => electionData) allElections;
+
+
 
     // Give voter the right to vote on this ballot.
     // May only be called by chairperson.
-    function giveRightToVote(address voter) public {
-        require((msg.sender == chairperson) &&  (voters[voter].weight == 0));
+    function giveRightToVote(address voter) public onlyOwner {
+        require(voters[voter] == 0);
 
-        voters[voter].weight = 1;
+        voters[voter] = 1;
         votersList.push(voter);
     }
 
-    /// Give your vote
-    function vote(Ballot proposal) public {
-        Voter storage sender = voters[msg.sender];
-        require(election.isValidBallot(proposal));
-        sender.vote = proposal;
+
+    enum validElection{
+      YesNoElection,
+      PluralityElection
+    }
+    function createElection(validElection electionType) public {
+      require(voters[msg.sender] > 0);
+      Election e;
+      if(electionType==validElection.YesNoElection){
+        e=new YesNoElection();
+      }else if(electionType==validElection.PluralityElection){
+        e=new PluralityElection(3);
+      }else{
+        revert();
+      }
+      allElections[e].election=e;
+      for(uint i=0;i<votersList.length;i++){
+        allElections[e].unclaimedWeight[votersList[i]]=voters[votersList[i]];
+      }
 
     }
 
-    /// Computes the winning proposal taking all
-    /// previous votes into account.
-    function winningProposal() public view
-            returns (Winner winningProposal)
-    {
-        mapping (Ballot => uint) tally;
-        for(uint i=0;i<votersList.length;i++){
-          Voter voter = voters[votersList[i]];
-          tally[voter.vote]+=voter.weight;
-        }
-        return election.getWinner(tally);
-    }
+
 
 }

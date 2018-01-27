@@ -5,6 +5,8 @@ accounts = web3.eth.accounts;
 code = {
   'owned.sol': fs.readFileSync('owned.sol').toString(),
   'Election.sol': fs.readFileSync('Election.sol').toString(),
+  'PluralityElection.sol': fs.readFileSync('PluralityElection.sol').toString(),
+  'Voting.sol': fs.readFileSync('Voting.sol').toString(),
   'YesNoElection.sol': fs.readFileSync('YesNoElection.sol').toString()
 };
 solc = require('solc');
@@ -14,13 +16,13 @@ if('errors' in compiledCode){
     console.log(compiledCode.errors[i]);
   }
 }
-YesNoElectionAbi = JSON.parse(compiledCode.contracts['YesNoElection.sol:YesNoElection'].interface);
-VotingContract = web3.eth.contract(YesNoElectionAbi);
-YesNoBallotAbi = JSON.parse(compiledCode.contracts['YesNoElection.sol:YesNoBallot'].interface);
-BallotContract = web3.eth.contract(YesNoBallotAbi);
+PluralityElectionAbi = JSON.parse(compiledCode.contracts['PluralityElection.sol:PluralityElection'].interface);
+VotingContract = web3.eth.contract(PluralityElectionAbi);
+PluralityBallotAbi = JSON.parse(compiledCode.contracts['PluralityElection.sol:PluralityBallot'].interface);
+BallotContract = web3.eth.contract(PluralityBallotAbi);
 ballots = {};
-byteCode = compiledCode.contracts['YesNoElection.sol:YesNoElection'].bytecode;
-deployedContract = VotingContract.new(
+byteCode = compiledCode.contracts['PluralityElection.sol:PluralityElection'].bytecode;
+deployedContract = VotingContract.new(3,
     {data: byteCode, from: accounts[0], gas: 4700000},
     function (err,contract){
       if(!err){
