@@ -4,9 +4,9 @@ import "Election.sol";
 
 /// @title choose a result by plurality vote
 contract PluralityElection is Election {
-  bytes32[] results;
-  uint size;
-  uint added;
+  bytes32[] public results;  //the list of possible winners
+  uint public size;          //the maximum number of winners
+  uint public added;         //the number of winners that have been added
   function PluralityElection(uint s) public {
     size = s;
     added = 0;

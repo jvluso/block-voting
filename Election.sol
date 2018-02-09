@@ -21,7 +21,9 @@ contract Election {
 
 contract Ballot is owned {
   bool public voted;
+  address public election;
   function Ballot() public {
     voted = false;
+    election = msg.sender;
   }
 }
