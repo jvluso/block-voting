@@ -4,17 +4,9 @@ import "Election.sol";
 
 /// @title choose a result by plurality vote
 contract PluralityElection is Election {
-  bytes32[] public results;  //the list of possible winners
-  uint public size;          //the maximum number of winners
-  uint public added;         //the number of winners that have been added
   function PluralityElection(uint s) public {
     size = s;
     added = 0;
-  }
-  function addWinner(bytes32 name) public {
-    require(added<size);
-    added++;
-    results.push(name);
   }
   function getBallot() public {
     Ballot b = new PluralityBallot();
