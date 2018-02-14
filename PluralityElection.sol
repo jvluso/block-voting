@@ -27,7 +27,7 @@ contract PluralityElection is Election {
         winningWeight=counts[i];
       }
     }
-    return results[winner];
+    return candidates[winner];
   }
 }
 

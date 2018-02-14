@@ -17,7 +17,7 @@ if('errors' in compiledCode){
 }
 ReferenceAbi = JSON.parse(compiledCode.contracts['Reference.sol:Reference'].interface);
 ReferenceContract = web3.eth.contract(ReferenceAbi);
-ReferenceInstance = ReferenceContract.at('0x225663ec2006640e2624346989f4ea570948a1fc');
+ReferenceInstance = ReferenceContract.at('0x333618cd53ef8e6a56413413d56486d2f2320499');
 PluralityElectionAbi = JSON.parse(compiledCode.contracts['PluralityElection.sol:PluralityElection'].interface);
 VotingContract = web3.eth.contract(PluralityElectionAbi);
 PluralityBallotAbi = JSON.parse(compiledCode.contracts['PluralityElection.sol:PluralityBallot'].interface);
@@ -36,6 +36,9 @@ deployedContract = VotingContract.new(3,
             ballots[response.args.index] = BallotContract.at(response.args.ballot);
           });
           ReferenceInstance.setRecentElection(contract.address,{from:accounts[0],gas:4700000});
+          contract.addCandidate("merkle",{from:accounts[0],gas:4700000});
+          contract.addCandidate("merkel",{from:accounts[0],gas:4700000});
+          contract.addCandidate("corbryn",{from:accounts[0],gas:4700000});
           console.log(contract.address);
         }
       }

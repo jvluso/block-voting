@@ -4,7 +4,7 @@ import "owned.sol";
 /// @title Election interface for Voting
 contract Election {
   Ballot[] public ballots;
-  bytes32[] public results;  //the list of possible winners
+  bytes32[] public candidates;  //the list of possible winners
   uint public size;          //the maximum number of winners
   uint public added;         //the number of winners that have been added
   mapping(address => uint) public weights;
@@ -14,10 +14,10 @@ contract Election {
     addBallot(b);
   }
 
-  function addWinner(bytes32 name) public {
+  function addCandidate(bytes32 name) public {
     require(added<size);
     added++;
-    results.push(name);
+    candidates.push(name);
   }
   function addBallot(Ballot b) internal {
     b.transferOwnership(msg.sender);
@@ -26,6 +26,9 @@ contract Election {
     BallotCreated(b,msg.sender,ballots.length-1);
   }
   function getWinner() public view returns (bytes32);
+  function getCandidate(uint num) public view returns (bytes32,uint){
+    return (candidates[num],num);
+  }
 }
 
 contract Ballot is owned {
