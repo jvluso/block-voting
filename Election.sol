@@ -1,41 +1,30 @@
 pragma solidity ^0.4.16;
-import "owned.sol";
 
 /// @title Election interface for Voting
 contract Election {
-  Ballot[] public ballots;
   bytes32[] public candidates;  //the list of possible winners
+  bytes32 public electionName;
   uint public size;          //the maximum number of winners
-  uint public added;         //the number of winners that have been added
   mapping(address => uint) public weights;
-  event BallotCreated(address ballot, address owner, uint index);
-  function getBallot() public {
-    Ballot b = new Ballot();
-    addBallot(b);
-  }
+  address[] public addressList;
 
   function addCandidate(bytes32 name) public {
-    require(added<size);
-    added++;
+    require(candidates.length<size);
     candidates.push(name);
   }
-  function addBallot(Ballot b) internal {
-    b.transferOwnership(msg.sender);
-    ballots.push(b);
-    weights[b]=1;
-    BallotCreated(b,msg.sender,ballots.length-1);
+  function addVoter(address v) public {
+    require(candidates.length<size);
+    weights[v] = 1;
+    addressList.push(v);
+  }
+  function setName(bytes32 n) public {
+    require(candidates.length<size);
+    electionName = n;
   }
   function getWinner() public view returns (bytes32);
+
+
   function getCandidate(uint num) public view returns (bytes32,uint){
     return (candidates[num],num);
-  }
-}
-
-contract Ballot is owned {
-  bool public voted;
-  address public election;
-  function Ballot() public {
-    voted = false;
-    election = msg.sender;
   }
 }
