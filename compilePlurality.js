@@ -16,7 +16,7 @@ if('errors' in compiledCode){
 }
 ReferenceAbi = JSON.parse(compiledCode.contracts['Reference.sol:Reference'].interface);
 ReferenceContract = web3.eth.contract(ReferenceAbi);
-ReferenceInstance = ReferenceContract.at('0x333618cd53ef8e6a56413413d56486d2f2320499');
+ReferenceInstance = ReferenceContract.at('0x1b26a4ed054c8ca4252008f7b9cdfc077a06216e');
 libraryAbi = JSON.parse(compiledCode.contracts['PluralityElection.sol:PluralityBallot'].interface);
 LibraryContract = web3.eth.contract(libraryAbi);
 contractAbi = JSON.parse(compiledCode.contracts['PluralityElection.sol:PluralityElection'].interface);
@@ -47,12 +47,13 @@ deployedLibrary = LibraryContract.new(
                     console.log(contract.address);
 
                     ReferenceInstance.setRecentElection(contract.address,{from:accounts[0],gas:4700000});
+                    contract.setName("who",{from: accounts[0],gas: 4700000});
                     contract.addVoter(accounts[0],{from: accounts[0],gas: 4700000});
                     contract.addVoter(accounts[1],{from: accounts[0],gas: 4700000});
                     contract.addVoter(accounts[2],{from: accounts[0],gas: 4700000});
-                    contract.addCandidate("merkle",{from:accounts[0],gas:4700000});
-                    contract.addCandidate("merkel",{from:accounts[0],gas:4700000});
-                    contract.addCandidate("corbryn",{from:accounts[0],gas:4700000});
+                    contract.addCandidate("Merkle",{from:accounts[0],gas:4700000});
+                    contract.addCandidate("Merkel",{from:accounts[0],gas:4700000});
+                    contract.addCandidate("Corbryn",{from:accounts[0],gas:4700000});
                     repl=require('repl').start('> ');
                     require('repl.history')(repl,process.env.HOME + '/.node_history');
                   }

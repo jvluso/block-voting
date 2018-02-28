@@ -14,6 +14,7 @@ contract PluralityElection is Election {
 
   function PluralityElection(uint s) public {
     size = s;
+    ballotType = "Plurality";
   }
   function getWinner() public view returns (bytes32){
     uint[] memory counts = new uint[](size);

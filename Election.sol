@@ -7,6 +7,7 @@ contract Election {
   uint public size;          //the maximum number of winners
   mapping(address => uint) public weights;
   address[] public addressList;
+  bytes32 public ballotType;
 
   function addCandidate(bytes32 name) public {
     require(candidates.length<size);
