@@ -1,12 +1,12 @@
 pragma solidity ^0.4.16;
 import "Election.sol";
 
-/// @title choose a result by plurality vote
+// The most well known election type - each person gets one vote, and whoever gets the most votes wins
 contract PluralityElection is Election {
   using PluralityBallot for PluralityBallot.ballot;
   mapping(address => PluralityBallot.ballot) public ballots;
 
-
+  //vote for candidate v
   function vote(uint v) public {
     require(weights[msg.sender] > 0 && v<size);
     ballots[msg.sender].changeVote(v);
@@ -16,6 +16,8 @@ contract PluralityElection is Election {
     size = s;
     ballotType = "Plurality";
   }
+
+  // gets the current winner
   function getWinner() public view returns (bytes32){
     uint[] memory counts = new uint[](size);
     for(uint i=0;i<addressList.length;i++){
@@ -36,8 +38,8 @@ contract PluralityElection is Election {
 }
 
 library PluralityBallot {
-  struct ballot{
-    bool voted;
+  struct ballot{  // keeping track of if they voted or not is important for making sure that candidate 0
+    bool voted;   // doesn't get all of the abstain votes
     uint vote;
   }
   function changeVote(ballot storage self,uint v) public {
